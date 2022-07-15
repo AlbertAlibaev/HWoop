@@ -16,6 +16,20 @@ class Student:
         else:
             return 'Ошибка'
 
+    def _avg_grade(self):
+        grade_list = []
+        for grade in self.grades.values():
+            grade_list.extend(grade)
+        res = sum(grade_list)/len(grade_list)
+        return round(res, 1)
+
+    def __str__(self):
+        res = f'Имя: {self.name} \nФамилия: {self.surname} \n' \
+              f'Средняя оценка за домашние задания: {self._avg_grade()} \n' \
+              f'Курсы в процессе обучения: {", ".join(self.courses_in_progress)} \n' \
+              f'Завершенные курсы: {", ".join(self.finished_courses)} \n'
+        return res
+
 
 class Mentor:
     def __init__(self, name, surname):
@@ -23,10 +37,19 @@ class Mentor:
         self.surname = surname
 
 
-class Lecturer(Mentor):
+class Lecturer(Mentor, Student):
     def __init__(self, name, surname):
         super().__init__(name, surname)
         self.grades = {}
+
+    def __str__(self):
+        res = f'Имя: {self.name} \nФамилия: {self.surname} \n' \
+              f'Средняя оценка за лекции: {self._avg_grade()} \n'
+        return res
+
+    def __lt__(self, other):
+        if isinstance(other, Lecturer):
+            return self._avg_grade() < other._avg_grade()
 
 
 class Reviewer(Mentor):
@@ -43,11 +66,16 @@ class Reviewer(Mentor):
         else:
             return 'Ошибка'
 
+    def __str__(self):
+        res = f'Имя: {self.name} \nФамилия: {self.surname} \n'
+        return res
+
 
 best_student = Student('Ruoy', 'Eman', 'male')
 good_student = Student('Vasya', 'Pupkin', 'male')
 best_student.courses_in_progress += ['Python']
 good_student.courses_in_progress += ['Python', 'Git']
+good_student.finished_courses += ['Введение в Python']
 
 cool_mentor = Mentor('Some', 'Buddy')
 cool_reviewer = Reviewer('some', 'body')
@@ -56,11 +84,17 @@ cool_reviewer.courses_attached += ['Python']
 cool_reviewer.rate_hw(best_student, 'Python', 10)
 cool_reviewer.rate_hw(best_student, 'Python', 10)
 cool_reviewer.rate_hw(best_student, 'Python', 9)
+cool_reviewer.rate_hw(good_student, 'Python', 10)
+cool_reviewer.rate_hw(good_student, 'Git', 10)
+cool_reviewer.rate_hw(good_student, 'Git', 7)
+cool_reviewer.rate_hw(good_student, 'Python', 9)
 
 first_lector = Lecturer('Petr', 'Petrovich')
 second_lector = Lecturer('Ivan', 'Ivanovich')
 best_student.rate_lection(first_lector, 'Python', 8)
-best_student.rate_lection(second_lector, 'Git', 7)
+good_student.rate_lection(second_lector, 'Git', 9)
 
-print(best_student.grades)
-print(first_lector.grades)
+print(good_student)
+print(first_lector)
+print(second_lector)
+print(first_lector > second_lector)
